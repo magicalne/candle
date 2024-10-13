@@ -5,7 +5,7 @@ use std::sync::Arc;
 
 use crate::models::recurrent_gemma::{Config, Rglru, RmsNorm, RotaryEmbedding, TemporalBlockType};
 
-fn rms_norm(size: usize, eps: f64, vb: VarBuilder) -> Result<RmsNorm> {
+fn rms_norm(size: usize, eps: f64, mut vb: VarBuilder) -> Result<RmsNorm> {
     let weight = vb.get(size, "weight")?.dequantize(vb.device())?;
     Ok(RmsNorm::from_weight(weight, eps))
 }
@@ -41,7 +41,7 @@ impl Module for Mlp {
     }
 }
 
-fn rglru(cfg: &Config, vb: VarBuilder) -> Result<Rglru> {
+fn rglru(cfg: &Config, mut vb: VarBuilder) -> Result<Rglru> {
     let h = cfg.hidden_size;
     let lru_width = cfg.lru_width.unwrap_or(h);
     let n_heads = cfg.num_attention_heads;
@@ -77,7 +77,7 @@ struct RecurrentBlock {
 }
 
 impl RecurrentBlock {
-    fn new(cfg: &Config, vb: VarBuilder) -> Result<Self> {
+    fn new(cfg: &Config, mut vb: VarBuilder) -> Result<Self> {
         let h = cfg.hidden_size;
         let lru_width = cfg.lru_width.unwrap_or(h);
         let linear_y = linear(h, lru_width, true, vb.pp("linear_y"))?;

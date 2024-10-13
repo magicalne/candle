@@ -107,7 +107,7 @@ struct T5LayerNorm {
 }
 
 impl T5LayerNorm {
-    fn load(h: usize, eps: f64, vb: VarBuilder) -> Result<Self> {
+    fn load(h: usize, eps: f64, mut vb: VarBuilder) -> Result<Self> {
         let weight = vb.get(h, "weight")?.dequantize(vb.device())?;
         Ok(Self {
             weight,

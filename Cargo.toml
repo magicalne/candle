@@ -7,8 +7,6 @@ members = [
     "candle-nn",
     "candle-pyo3",
     "candle-transformers",
-    "candle-wasm-examples/*",
-    "candle-wasm-tests",
     "tensor-tools",
 ]
 exclude = [

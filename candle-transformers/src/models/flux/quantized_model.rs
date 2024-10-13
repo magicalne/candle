@@ -39,7 +39,7 @@ pub struct QkNorm {
 }
 
 impl QkNorm {
-    fn new(dim: usize, vb: VarBuilder) -> Result<Self> {
+    fn new(dim: usize, mut vb: VarBuilder) -> Result<Self> {
         let query_norm = vb.get(dim, "query_norm.scale")?.dequantize(vb.device())?;
         let query_norm = RmsNorm::new(query_norm, 1e-6);
         let key_norm = vb.get(dim, "key_norm.scale")?.dequantize(vb.device())?;

@@ -10,7 +10,7 @@ pub struct Embedding {
 }
 
 impl Embedding {
-    pub fn new(d1: usize, d2: usize, vb: VarBuilder) -> Result<Self> {
+    pub fn new(d1: usize, d2: usize, mut vb: VarBuilder) -> Result<Self> {
         let embeddings = vb.get((d1, d2), "weight")?.dequantize(vb.device())?;
         let inner = candle_nn::Embedding::new(embeddings, d2);
         let span = tracing::span!(tracing::Level::TRACE, "embedding");
@@ -56,7 +56,7 @@ impl Module for Linear {
     }
 }
 
-pub fn linear_b(in_dim: usize, out_dim: usize, bias: bool, vb: VarBuilder) -> Result<Linear> {
+pub fn linear_b(in_dim: usize, out_dim: usize, bias: bool, mut vb: VarBuilder) -> Result<Linear> {
     let bias = if bias {
         Some(vb.get(out_dim, "bias")?.dequantize(vb.device())?)
     } else {
@@ -66,7 +66,7 @@ pub fn linear_b(in_dim: usize, out_dim: usize, bias: bool, vb: VarBuilder) -> Re
     Ok(Linear { weight, bias })
 }
 
-pub fn linear(in_dim: usize, out_dim: usize, vb: VarBuilder) -> Result<Linear> {
+pub fn linear(in_dim: usize, out_dim: usize, mut vb: VarBuilder) -> Result<Linear> {
     let bias = vb.get(out_dim, "bias")?.dequantize(vb.device())?;
     let weight = QMatMul::new(in_dim, out_dim, vb)?;
     Ok(Linear {
@@ -75,13 +75,17 @@ pub fn linear(in_dim: usize, out_dim: usize, vb: VarBuilder) -> Result<Linear> {
     })
 }
 
-pub fn layer_norm(size: usize, eps: f64, vb: VarBuilder) -> Result<candle_nn::LayerNorm> {
+pub fn layer_norm(size: usize, eps: f64, mut vb: VarBuilder) -> Result<candle_nn::LayerNorm> {
     let weight = vb.get(size, "weight")?.dequantize(vb.device())?;
     let bias = vb.get(size, "bias")?.dequantize(vb.device())?;
     Ok(candle_nn::LayerNorm::new(weight, bias, eps))
 }
 
-pub fn layer_norm_no_bias(size: usize, eps: f64, vb: VarBuilder) -> Result<candle_nn::LayerNorm> {
+pub fn layer_norm_no_bias(
+    size: usize,
+    eps: f64,
+    mut vb: VarBuilder,
+) -> Result<candle_nn::LayerNorm> {
     let weight = vb.get(size, "weight")?.dequantize(vb.device())?;
     Ok(candle_nn::LayerNorm::new_no_bias(weight, eps))
 }
@@ -99,7 +103,7 @@ pub struct RmsNorm {
 }
 
 impl RmsNorm {
-    pub fn new(size: usize, eps: f64, vb: VarBuilder) -> Result<Self> {
+    pub fn new(size: usize, eps: f64, mut vb: VarBuilder) -> Result<Self> {
         let span = tracing::span!(tracing::Level::TRACE, "rms-norm");
         let weight = vb.get(size, "weight")?.dequantize(vb.device())?;
         Ok(Self { weight, eps, span })

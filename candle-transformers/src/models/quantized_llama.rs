@@ -455,13 +455,17 @@ impl ModelWeights {
 
     pub fn forward(&mut self, x: &Tensor, index_pos: usize) -> Result<Tensor> {
         let (_b_sz, seq_len) = x.dims2()?;
+        println!("index_pos: {index_pos}");
+        println!("{_b_sz}, seq_len: {seq_len}");
         let mask = if seq_len == 1 {
             None
         } else {
             Some(self.mask(seq_len, x.device())?)
         };
+        println!("masks: {mask:?}");
         let _enter = self.span.enter();
         let mut layer_in = self.tok_embeddings.forward(x)?;
+        println!("layer_in: {layer_in}");
         for layer in self.layers.iter_mut() {
             let x = layer_in;
             let residual = &x;

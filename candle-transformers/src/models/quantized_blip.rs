@@ -15,7 +15,7 @@ struct VisionEmbeddings {
 }
 
 impl VisionEmbeddings {
-    fn new(cfg: &VisionConfig, vb: VarBuilder) -> Result<Self> {
+    fn new(cfg: &VisionConfig, mut vb: VarBuilder) -> Result<Self> {
         let class_embedding = vb
             .get((1, 1, cfg.hidden_size), "class_embedding")?
             .dequantize(vb.device())?;
@@ -23,7 +23,7 @@ impl VisionEmbeddings {
             stride: cfg.patch_size,
             ..Default::default()
         };
-        let pe_vb = vb.pp("patch_embedding");
+        let mut pe_vb = vb.pp("patch_embedding");
         let pe_weight = pe_vb
             .get(
                 (cfg.hidden_size, 3, cfg.patch_size, cfg.patch_size),

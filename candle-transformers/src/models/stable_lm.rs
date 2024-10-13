@@ -399,6 +399,7 @@ impl Model {
     }
 
     pub fn forward(&mut self, input_ids: &Tensor, seqlen_offset: usize) -> Result<Tensor> {
+        println!("{input_ids}");
         let _enter = self.span.enter();
         let (b_size, seq_len) = input_ids.dims2()?;
         let attention_mask = if seq_len <= 1 {
@@ -407,7 +408,9 @@ impl Model {
             let mask = self.prepare_decoder_attention_mask(b_size, seq_len, seqlen_offset)?;
             Some(mask)
         };
+        println!("{attention_mask:?}");
         let mut xs = self.embed_tokens.forward(input_ids)?;
+        println!("embed_tokens: {xs}");
         for layer in self.layers.iter_mut() {
             xs = layer.forward(&xs, attention_mask.as_ref(), seqlen_offset)?
         }

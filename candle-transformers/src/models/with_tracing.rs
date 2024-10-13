@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use candle::{Module, Result, Tensor};
 use candle_nn::VarBuilder;
 
@@ -109,10 +111,10 @@ impl QMatMul {
     pub fn new(
         out_dim: usize,
         in_dim: usize,
-        vb: crate::quantized_var_builder::VarBuilder,
+        mut vb: crate::quantized_var_builder::VarBuilder,
     ) -> Result<Self> {
         let ws = vb.get((in_dim, out_dim), "weight")?;
-        let inner = candle::quantized::QMatMul::from_arc(ws)?;
+        let inner = candle::quantized::QMatMul::from_arc(Arc::new(ws))?;
         let span = tracing::span!(tracing::Level::TRACE, "qmatmul");
         Ok(Self { inner, span })
     }

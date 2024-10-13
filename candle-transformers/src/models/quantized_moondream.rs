@@ -111,7 +111,7 @@ struct VisionTransformer {
 }
 
 impl VisionTransformer {
-    fn new(cfg: &VisionConfig, vb: VarBuilder) -> Result<Self> {
+    fn new(cfg: &VisionConfig, mut vb: VarBuilder) -> Result<Self> {
         let patch_embed = LinearPatchEmbedding::new(vb.pp("patch_embed"))?;
         let pos_embed = vb
             .get((1, cfg.embed_len, cfg.embed_dim), "pos_embed")?

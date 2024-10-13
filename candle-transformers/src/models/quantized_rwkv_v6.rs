@@ -32,7 +32,7 @@ struct SelfAttention {
 }
 
 impl SelfAttention {
-    fn new(layer_id: usize, cfg: &Config, vb: VarBuilder) -> Result<Self> {
+    fn new(layer_id: usize, cfg: &Config, mut vb: VarBuilder) -> Result<Self> {
         let hidden_size = cfg.hidden_size;
         let attn_hidden_size = cfg.attention_hidden_size;
         let key = linear(hidden_size, attn_hidden_size, vb.pp("key"))?;
@@ -41,7 +41,7 @@ impl SelfAttention {
         let gate = linear(hidden_size, attn_hidden_size, vb.pp("gate"))?;
         let output = linear(attn_hidden_size, hidden_size, vb.pp("output"))?;
 
-        let vb_x = vb.pp("ln_x");
+        let mut vb_x = vb.pp("ln_x");
         let ln_x_weight = vb_x.get(hidden_size, "weight")?.dequantize(vb.device())?;
         let ln_x_bias = vb_x.get(hidden_size, "bias")?.dequantize(vb.device())?;
 
@@ -203,7 +203,7 @@ struct FeedForward {
 }
 
 impl FeedForward {
-    fn new(layer_id: usize, cfg: &Config, vb: VarBuilder) -> Result<Self> {
+    fn new(layer_id: usize, cfg: &Config, mut vb: VarBuilder) -> Result<Self> {
         let int_size = cfg
             .intermediate_size
             .unwrap_or(((cfg.hidden_size as f64 * 3.5) as usize) / 32 * 32);

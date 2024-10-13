@@ -9,7 +9,7 @@ fn conv1d(
     out_channels: usize,
     kernel_size: usize,
     config: Conv1dConfig,
-    vb: VarBuilder,
+    mut vb: VarBuilder,
 ) -> Result<Conv1d> {
     let weight = vb
         .get((out_channels, in_channels, kernel_size), "weight")?
@@ -313,7 +313,7 @@ pub struct TextDecoder {
 }
 
 impl TextDecoder {
-    fn load(vb: VarBuilder, cfg: &Config) -> Result<Self> {
+    fn load(mut vb: VarBuilder, cfg: &Config) -> Result<Self> {
         let span = tracing::span!(tracing::Level::TRACE, "text-decoder");
         let span_final = tracing::span!(tracing::Level::TRACE, "text-decoder-final");
         let n_state = cfg.d_model;
